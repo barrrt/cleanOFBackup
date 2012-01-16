@@ -51,7 +51,6 @@ def delete_backups
   # delete each backup file
   files.each do |f|
     begin
-      puts f
       FileUtils.rm_rf f
     rescue
       # do nothing if error occurs, file will be deleted next time
@@ -125,6 +124,12 @@ def turn_off
 end # turn_off
 
 # ########################################
+def delayed_delete
+  sleep 10
+  delete_backups
+end
+
+# ########################################
 def print_usage_info
   msg = <<XXXX
 
@@ -134,11 +139,14 @@ Usage:
   #{__FILE__}
   #{__FILE__} on
   #{__FILE__} off
+  #{__FILE__} delayed
 
   First case removes backups.
   Second case turns on automatic watching of #{OF_BACKUP_FOLDER_NAME} folder.
   Third case turns off the automatic backup deletion.
-
+  Fourth case removes backups after a short delay. This case is used by the automated
+    backup removal script, in order to give OmniFocus to complete backup before removing
+    the backup folder.
 
 XXXX
 
@@ -160,6 +168,8 @@ elsif ARGV.length == 1
     turn_on
   elsif ARGV[0].downcase == "off"
     turn_off
+  elsif ARGV[0].downcase == "delayed"
+    delayed_delete
   else
     print_usage_info
   end
@@ -187,6 +197,7 @@ __END__
         <key>ProgramArguments</key>
         <array>
           <string>SCRIPT_NAME</string>
+          <string>delayed</string>
         </array>
 
         <key>WatchPaths</key>
